@@ -1,5 +1,24 @@
 package main
 
+// @title           B-Resto API
+// @version         1.0
+// @description     API RESTful para sistema POS de restaurantes
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   Soporte API
+// @contact.email  support@b-resto.com
+
+// @license.name  MIT
+// @license.url   https://opensource.org/licenses/MIT
+
+// @host      localhost:8080
+// @BasePath  /api
+
+// @securityDefinitions.apikey Bearer
+// @in header
+// @name Authorization
+// @description Escribir "Bearer {token}" para autenticación JWT
+
 import (
 	"b-resto/config"
 	"b-resto/models"

@@ -8,7 +8,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetCompanies obtiene todas las compañías
+// GetCompanies godoc
+// @Summary      Listar compañías
+// @Description  Obtiene lista de todas las compañías y sucursales
+// @Tags         companies
+// @Accept       json
+// @Produce      json
+// @Param        is_active      query  string  false  "Filtrar por estado activo"  Enums(true, false)
+// @Param        with_parent    query  string  false  "Incluir compañía matriz"    Enums(true, false)
+// @Param        with_branches  query  string  false  "Incluir sucursales"         Enums(true, false)
+// @Success      200  {object}  map[string]interface{}  "data: array de companies"
+// @Failure      500  {object}  map[string]string       "error: mensaje"
+// @Router       /companies [get]
+// @Security     Bearer
 func GetCompanies(c *gin.Context) {
 	var companies []models.Company
 
@@ -36,7 +48,17 @@ func GetCompanies(c *gin.Context) {
 	})
 }
 
-// GetCompany obtiene una compañía por ID
+// GetCompany godoc
+// @Summary      Obtener compañía
+// @Description  Obtiene una compañía por ID con sus relaciones
+// @Tags         companies
+// @Accept       json
+// @Produce      json
+// @Param        id  path  int  true  "ID de la compañía"
+// @Success      200  {object}  map[string]interface{}  "data: company con parent y branches"
+// @Failure      404  {object}  map[string]string       "error: Company not found"
+// @Router       /companies/{id} [get]
+// @Security     Bearer
 func GetCompany(c *gin.Context) {
 	id := c.Param("id")
 	var company models.Company
@@ -55,7 +77,18 @@ func GetCompany(c *gin.Context) {
 	})
 }
 
-// CreateCompany crea una nueva compañía
+// CreateCompany godoc
+// @Summary      Crear compañía
+// @Description  Crea una nueva compañía (casa matriz) o sucursal
+// @Tags         companies
+// @Accept       json
+// @Produce      json
+// @Param        company  body  models.Company  true  "Datos de la compañía (incluir parent_id para sucursal)"
+// @Success      201  {object}  map[string]interface{}  "message y data con la compañía creada"
+// @Failure      400  {object}  map[string]string       "error: validación o parent no encontrado"
+// @Failure      409  {object}  map[string]string       "error: nombre ya existe"
+// @Router       /companies [post]
+// @Security     Bearer
 func CreateCompany(c *gin.Context) {
 	var company models.Company
 
@@ -93,7 +126,19 @@ func CreateCompany(c *gin.Context) {
 	})
 }
 
-// UpdateCompany actualiza una compañía existente
+// UpdateCompany godoc
+// @Summary      Actualizar compañía
+// @Description  Actualiza los datos de una compañía existente
+// @Tags         companies
+// @Accept       json
+// @Produce      json
+// @Param        id       path  int              true  "ID de la compañía"
+// @Param        company  body  models.Company   true  "Datos actualizados"
+// @Success      200  {object}  map[string]interface{}  "message y data actualizada"
+// @Failure      400  {object}  map[string]string       "error: validación"
+// @Failure      404  {object}  map[string]string       "error: Company not found"
+// @Router       /companies/{id} [put]
+// @Security     Bearer
 func UpdateCompany(c *gin.Context) {
 	id := c.Param("id")
 	var company models.Company
@@ -138,7 +183,18 @@ func UpdateCompany(c *gin.Context) {
 	})
 }
 
-// DeleteCompany elimina una compañía (soft delete)
+// DeleteCompany godoc
+// @Summary      Eliminar compañía
+// @Description  Elimina una compañía (soft delete). No permite eliminar si tiene sucursales activas.
+// @Tags         companies
+// @Accept       json
+// @Produce      json
+// @Param        id  path  int  true  "ID de la compañía"
+// @Success      200  {object}  map[string]string  "message: Company deleted successfully"
+// @Failure      400  {object}  map[string]string  "error: tiene sucursales activas"
+// @Failure      404  {object}  map[string]string  "error: Company not found"
+// @Router       /companies/{id} [delete]
+// @Security     Bearer
 func DeleteCompany(c *gin.Context) {
 	id := c.Param("id")
 	var company models.Company
@@ -166,7 +222,17 @@ func DeleteCompany(c *gin.Context) {
 	})
 }
 
-// ToggleCompanyStatus activa/desactiva una compañía
+// ToggleCompanyStatus godoc
+// @Summary      Activar/Desactivar compañía
+// @Description  Cambia el estado is_active de una compañía
+// @Tags         companies
+// @Accept       json
+// @Produce      json
+// @Param        id  path  int  true  "ID de la compañía"
+// @Success      200  {object}  map[string]interface{}  "message y data con nuevo estado"
+// @Failure      404  {object}  map[string]string       "error: Company not found"
+// @Router       /companies/{id}/toggle [patch]
+// @Security     Bearer
 func ToggleCompanyStatus(c *gin.Context) {
 	id := c.Param("id")
 	var company models.Company

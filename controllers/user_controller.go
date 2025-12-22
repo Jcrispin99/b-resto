@@ -7,7 +7,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetProfile obtiene el perfil del usuario autenticado
+// GetProfile godoc
+// @Summary      Obtener perfil del usuario
+// @Description  Obtiene el perfil del usuario autenticado desde el token JWT
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  map[string]interface{}  "user: datos del usuario"
+// @Failure      400  {object}  map[string]string       "error: invalid token claims"
+// @Router       /profile [get]
+// @Security     Bearer
 func GetProfile(c *gin.Context) {
 	username, exists := c.Get("username")
 	if !exists {
@@ -24,7 +33,16 @@ func GetProfile(c *gin.Context) {
 	})
 }
 
-// GetUsers obtiene todos los usuarios (solo para admins	)
+// GetUsers godoc
+// @Summary      Listar usuarios
+// @Description  Obtiene lista de todos los usuarios (solo admin)
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  map[string]interface{}  "users: array de usuarios"
+// @Failure      500  {object}  map[string]string       "error: Failed to fetch users"
+// @Router       /admin/users [get]
+// @Security     Bearer
 func GetUsers(c *gin.Context) {
 	// En una aplicación real, obtendrías los usuarios de la BD
 	users := []models.User{
@@ -48,7 +66,15 @@ func GetUsers(c *gin.Context) {
 	})
 }
 
-// CreateResource crea un nuevo recurso (solo para admins)
+// CreateResource godoc
+// @Summary      Crear recurso
+// @Description  Crea un nuevo recurso (solo admin)
+// @Tags         resources
+// @Accept       json
+// @Produce      json
+// @Success      201  {object}  map[string]string  "message: Resource created by admin"
+// @Router       /admin/resources [post]
+// @Security     Bearer
 func CreateResource(c *gin.Context) {
 	var resource map[string]interface{}
 
@@ -63,7 +89,16 @@ func CreateResource(c *gin.Context) {
 	})
 }
 
-// UpdateResource actualiza un recurso existente
+// UpdateResource godoc
+// @Summary      Actualizar recurso
+// @Description  Actualiza un recurso (endpoint de ejemplo)
+// @Tags         resources
+// @Accept       json
+// @Produce      json
+// @Param        id  path  string  true  "ID del recurso"
+// @Success      200  {object}  map[string]string  "message: Resource updated"
+// @Router       /resources/{id} [put]
+// @Security     Bearer
 func UpdateResource(c *gin.Context) {
 	resourceID := c.Param("id")
 
@@ -80,7 +115,16 @@ func UpdateResource(c *gin.Context) {
 	})
 }
 
-// DeleteResource elimina un recurso (solo para admins)
+// DeleteResource godoc
+// @Summary      Eliminar recurso
+// @Description  Elimina un recurso (solo admin)
+// @Tags         resources
+// @Accept       json
+// @Produce      json
+// @Param        id  path  string  true  "ID del recurso"
+// @Success      200  {object}  map[string]string  "message: Resource deleted by admin"
+// @Router       /admin/resources/{id} [delete]
+// @Security     Bearer
 func DeleteResource(c *gin.Context) {
 	resourceID := c.Param("id")
 
@@ -90,7 +134,14 @@ func DeleteResource(c *gin.Context) {
 	})
 }
 
-// GetPublicData obtiene datos públicos (accesible para todos)
+// GetPublicData godoc
+// @Summary      Obtener datos públicos
+// @Description  Obtiene datos públicos sin autenticación
+// @Tags         public
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  map[string]string  "message: Public data accessible to everyone"
+// @Router       /public/data [get]
 func GetPublicData(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "This is public data, accessible to everyone",

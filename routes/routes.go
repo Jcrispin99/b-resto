@@ -7,22 +7,31 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	_ "b-resto/docs" // SetupRoutes configura todas las rutas de la aplicación
 )
 
 func SetupRoutes(r *gin.Engine) {
+	// Ruta raíz
 	r.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Welcome to the Go Authentication Demo!",
-			"version": "1.0.0",
-		})
+		c.JSON(http.StatusOK, gin.H{"message": "Welcome to B-Resto API"})
 	})
 
+	// Swagger UI (solo en desarrollo)
+	if config.GetEnvironment() == "development" {
+		r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	}
+
+	// Rutas de autenticación
 	auth := r.Group("/auth")
 	{
 		auth.POST("/login", controllers.Login)
 		auth.POST("/register", controllers.Register)
 	}
 
+	// Rutas públicas
 	public := r.Group("/public")
 	{
 		public.GET("/data", controllers.GetPublicData)

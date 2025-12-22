@@ -4,34 +4,55 @@ import (
 	"b-resto/config"
 	"b-resto/models"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-// GetUnits obtiene todas las unidades
+// GetUnits godoc
+// @Summary      Listar unidades
+// @Description  Obtiene lista de todas las unidades de medida
+// @Tags         units
+// @Accept       json
+// @Produce      json
+// @Param        is_active  query  string  false  "Filtrar por estado activo"  Enums(true, false)
+// @Success      200  {object}  map[string]interface{}  "data: array de units"
+// @Failure      500  {object}  map[string]string       "error: mensaje"
+// @Router       /units [get]
+// @Security     Bearer
 func GetUnits(c *gin.Context) {
 	var units []models.Unit
 
-	// // Filtro opcional por is_active
-	// isActiveParam := c.Query("is_active")
-	// query := config.DB
+	// Filtro opcional por is_active
+	isActiveParam := c.Query("is_active")
+	query := config.DB
 
-	// if isActiveParam != "" {
-	// 	isActive, _ := strconv.ParseBool(isActiveParam)
-	// 	query = query.Where("is_active = ?", isActive)
-	// }
+	if isActiveParam != "" {
+		isActive, _ := strconv.ParseBool(isActiveParam)
+		query = query.Where("is_active = ?", isActive)
+	}
 
-	// if err := query.Find(&units).Error; err != nil {
-	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch units"})
-	// 	return
-	// }
+	if err := query.Find(&units).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch units"})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": units,
 	})
 }
 
-// GetUnit obtiene una unidad por ID
+// GetUnit godoc
+// @Summary      Obtener unidad
+// @Description  Obtiene una unidad de medida por ID
+// @Tags         units
+// @Accept       json
+// @Produce      json
+// @Param        id  path  int  true  "ID de la unidad"
+// @Success      200  {object}  map[string]interface{}  "data: unit"
+// @Failure      404  {object}  map[string]string       "error: Unit not found"
+// @Router       /units/{id} [get]
+// @Security     Bearer
 func GetUnit(c *gin.Context) {
 	id := c.Param("id")
 	var unit models.Unit
@@ -46,7 +67,18 @@ func GetUnit(c *gin.Context) {
 	})
 }
 
-// CreateUnit crea una nueva unidad
+// CreateUnit godoc
+// @Summary      Crear unidad
+// @Description  Crea una nueva unidad de medida
+// @Tags         units
+// @Accept       json
+// @Produce      json
+// @Param        unit  body  models.Unit  true  "Datos de la unidad (name, abbreviation, type)"
+// @Success      201  {object}  map[string]interface{}  "message y data creada"
+// @Failure      400  {object}  map[string]string       "error: validación"
+// @Failure      409  {object}  map[string]string       "error: nombre o abreviación duplicada"
+// @Router       /units [post]
+// @Security     Bearer
 func CreateUnit(c *gin.Context) {
 	var unit models.Unit
 
@@ -74,7 +106,19 @@ func CreateUnit(c *gin.Context) {
 	})
 }
 
-// UpdateUnit actualiza una unidad existente
+// UpdateUnit godoc
+// @Summary      Actualizar unidad
+// @Description  Actualiza los datos de una unidad existente
+// @Tags         units
+// @Accept       json
+// @Produce      json
+// @Param        id    path  int          true  "ID de la unidad"
+// @Param        unit  body  models.Unit  true  "Datos actualizados"
+// @Success      200  {object}  map[string]interface{}  "message y data actualizada"
+// @Failure      400  {object}  map[string]string       "error: validación"
+// @Failure      404  {object}  map[string]string       "error: Unit not found"
+// @Router       /units/{id} [put]
+// @Security     Bearer
 func UpdateUnit(c *gin.Context) {
 	id := c.Param("id")
 	var unit models.Unit
@@ -104,7 +148,17 @@ func UpdateUnit(c *gin.Context) {
 	})
 }
 
-// DeleteUnit elimina una unidad (soft delete)
+// DeleteUnit godoc
+// @Summary      Eliminar unidad
+// @Description  Elimina una unidad de medida (soft delete)
+// @Tags         units
+// @Accept       json
+// @Produce      json
+// @Param        id  path  int  true  "ID de la unidad"
+// @Success      200  {object}  map[string]string  "message: Unit deleted successfully"
+// @Failure      404  {object}  map[string]string  "error: Unit not found"
+// @Router       /units/{id} [delete]
+// @Security     Bearer
 func DeleteUnit(c *gin.Context) {
 	id := c.Param("id")
 	var unit models.Unit
@@ -125,7 +179,17 @@ func DeleteUnit(c *gin.Context) {
 	})
 }
 
-// ToggleUnitStatus activa/desactiva una unidad
+// ToggleUnitStatus godoc
+// @Summary      Activar/Desactivar unidad
+// @Description  Cambia el estado is_active de una unidad
+// @Tags         units
+// @Accept       json
+// @Produce      json
+// @Param        id  path  int  true  "ID de la unidad"
+// @Success      200  {object}  map[string]interface{}  "message y data con nuevo estado"
+// @Failure      404  {object}  map[string]string       "error: Unit not found"
+// @Router       /units/{id}/toggle [patch]
+// @Security     Bearer
 func ToggleUnitStatus(c *gin.Context) {
 	id := c.Param("id")
 	var unit models.Unit

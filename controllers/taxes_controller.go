@@ -8,7 +8,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetTaxes obtiene todos los impuestos
+// GetTaxes godoc
+// @Summary      Listar impuestos
+// @Description  Obtiene lista de todos los impuestos configurados
+// @Tags         taxes
+// @Accept       json
+// @Produce      json
+// @Param        is_active  query  string  false  "Filtrar por estado activo"  Enums(true, false)
+// @Success      200  {object}  map[string]interface{}  "data: array de taxes"
+// @Failure      500  {object}  map[string]string       "error: mensaje"
+// @Router       /taxes [get]
+// @Security     Bearer
 func GetTaxes(c *gin.Context) {
 	var taxes []models.Tax
 
@@ -25,7 +35,17 @@ func GetTaxes(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": taxes})
 }
 
-// GetTax obtiene un impuesto por ID
+// GetTax godoc
+// @Summary      Obtener impuesto
+// @Description  Obtiene un impuesto por ID
+// @Tags         taxes
+// @Accept       json
+// @Produce      json
+// @Param        id  path  int  true  "ID del impuesto"
+// @Success      200  {object}  map[string]interface{}  "data: tax"
+// @Failure      404  {object}  map[string]string       "error: Tax not found"
+// @Router       /taxes/{id} [get]
+// @Security     Bearer
 func GetTax(c *gin.Context) {
 	id := c.Param("id")
 	var tax models.Tax
@@ -38,7 +58,18 @@ func GetTax(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": tax})
 }
 
-// CreateTax crea un nuevo impuesto
+// CreateTax godoc
+// @Summary      Crear impuesto
+// @Description  Crea un nuevo impuesto
+// @Tags         taxes
+// @Accept       json
+// @Produce      json
+// @Param        tax  body  models.Tax  true  "Datos del impuesto"
+// @Success      201  {object}  map[string]interface{}  "message y data creada"
+// @Failure      400  {object}  map[string]string       "error: validación"
+// @Failure      409  {object}  map[string]string       "error: nombre duplicado"
+// @Router       /taxes [post]
+// @Security     Bearer
 func CreateTax(c *gin.Context) {
 	var tax models.Tax
 
@@ -66,7 +97,19 @@ func CreateTax(c *gin.Context) {
 	})
 }
 
-// UpdateTax actualiza un impuesto existente
+// UpdateTax godoc
+// @Summary      Actualizar impuesto
+// @Description  Actualiza los datos de un impuesto existente
+// @Tags         taxes
+// @Accept       json
+// @Produce      json
+// @Param        id   path  int         true  "ID del impuesto"
+// @Param        tax  body  models.Tax  true  "Datos actualizados"
+// @Success      200  {object}  map[string]interface{}  "message y data actualizada"
+// @Failure      400  {object}  map[string]string       "error: validación"
+// @Failure      404  {object}  map[string]string       "error: Tax not found"
+// @Router       /taxes/{id} [put]
+// @Security     Bearer
 func UpdateTax(c *gin.Context) {
 	id := c.Param("id")
 	var tax models.Tax
@@ -93,7 +136,17 @@ func UpdateTax(c *gin.Context) {
 	})
 }
 
-// DeleteTax elimina un impuesto (soft delete)
+// DeleteTax godoc
+// @Summary      Eliminar impuesto
+// @Description  Elimina un impuesto (soft delete)
+// @Tags         taxes
+// @Accept       json
+// @Produce      json
+// @Param        id  path  int  true  "ID del impuesto"
+// @Success      200  {object}  map[string]string  "message: Tax deleted successfully"
+// @Failure      404  {object}  map[string]string  "error: Tax not found"
+// @Router       /taxes/{id} [delete]
+// @Security     Bearer
 func DeleteTax(c *gin.Context) {
 	id := c.Param("id")
 	var tax models.Tax
@@ -111,7 +164,17 @@ func DeleteTax(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Tax deleted successfully"})
 }
 
-// ToggleTaxStatus activa/desactiva un impuesto
+// ToggleTaxStatus godoc
+// @Summary      Activar/Desactivar impuesto
+// @Description  Cambia el estado is_active de un impuesto
+// @Tags         taxes
+// @Accept       json
+// @Produce      json
+// @Param        id  path  int  true  "ID del impuesto"
+// @Success      200  {object}  map[string]interface{}  "message y data con nuevo estado"
+// @Failure      404  {object}  map[string]string       "error: Tax not found"
+// @Router       /taxes/{id}/toggle [patch]
+// @Security     Bearer
 func ToggleTaxStatus(c *gin.Context) {
 	id := c.Param("id")
 	var tax models.Tax

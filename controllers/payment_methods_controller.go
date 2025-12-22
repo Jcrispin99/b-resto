@@ -8,7 +8,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetPaymentMethods obtiene todos los métodos de pago
+// GetPaymentMethods godoc
+// @Summary      Listar métodos de pago
+// @Description  Obtiene lista de todos los métodos de pago disponibles
+// @Tags         payment-methods
+// @Accept       json
+// @Produce      json
+// @Param        is_active  query  string  false  "Filtrar por estado activo"  Enums(true, false)
+// @Success      200  {object}  map[string]interface{}  "data: array de payment methods"
+// @Failure      500  {object}  map[string]string       "error: mensaje"
+// @Router       /payment-methods [get]
+// @Security     Bearer
 func GetPaymentMethods(c *gin.Context) {
 	var paymentMethods []models.PaymentMethod
 
@@ -25,7 +35,17 @@ func GetPaymentMethods(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": paymentMethods})
 }
 
-// GetPaymentMethod obtiene un método de pago por ID
+// GetPaymentMethod godoc
+// @Summary      Obtener método de pago
+// @Description  Obtiene un método de pago por ID
+// @Tags         payment-methods
+// @Accept       json
+// @Produce      json
+// @Param        id  path  int  true  "ID del método de pago"
+// @Success      200  {object}  map[string]interface{}  "data: payment method"
+// @Failure      404  {object}  map[string]string       "error: Payment method not found"
+// @Router       /payment-methods/{id} [get]
+// @Security     Bearer
 func GetPaymentMethod(c *gin.Context) {
 	id := c.Param("id")
 	var paymentMethod models.PaymentMethod
@@ -38,7 +58,18 @@ func GetPaymentMethod(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": paymentMethod})
 }
 
-// CreatePaymentMethod crea un nuevo método de pago
+// CreatePaymentMethod godoc
+// @Summary      Crear método de pago
+// @Description  Crea un nuevo método de pago
+// @Tags         payment-methods
+// @Accept       json
+// @Produce      json
+// @Param        paymentMethod  body  models.PaymentMethod  true  "Datos del método de pago"
+// @Success      201  {object}  map[string]interface{}  "message y data creada"
+// @Failure      400  {object}  map[string]string       "error: validación"
+// @Failure      409  {object}  map[string]string       "error: código duplicado"
+// @Router       /payment-methods [post]
+// @Security     Bearer
 func CreatePaymentMethod(c *gin.Context) {
 	var paymentMethod models.PaymentMethod
 
@@ -66,7 +97,20 @@ func CreatePaymentMethod(c *gin.Context) {
 	})
 }
 
-// UpdatePaymentMethod actualiza un método de pago existente
+// UpdatePaymentMethod godoc
+// @Summary      Actualizar método de pago
+// @Description  Actualiza los datos de un método de pago existente
+// @Tags         payment-methods
+// @Accept       json
+// @Produce      json
+// @Param        id             path  int                   true  "ID del método de pago"
+// @Param        paymentMethod  body  models.PaymentMethod  true  "Datos actualizados"
+// @Success      200  {object}  map[string]interface{}  "message y data actualizada"
+// @Failure      400  {object}  map[string]string       "error: validación"
+// @Failure      404  {object}  map[string]string       "error: Payment method not found"
+// @Failure      409  {object}  map[string]string       "error: código duplicado"
+// @Router       /payment-methods/{id} [put]
+// @Security     Bearer
 func UpdatePaymentMethod(c *gin.Context) {
 	id := c.Param("id")
 	var paymentMethod models.PaymentMethod
@@ -102,7 +146,17 @@ func UpdatePaymentMethod(c *gin.Context) {
 	})
 }
 
-// DeletePaymentMethod elimina un método de pago (soft delete)
+// DeletePaymentMethod godoc
+// @Summary      Eliminar método de pago
+// @Description  Elimina un método de pago (soft delete)
+// @Tags         payment-methods
+// @Accept       json
+// @Produce      json
+// @Param        id  path  int  true  "ID del método de pago"
+// @Success      200  {object}  map[string]string  "message: Payment method deleted successfully"
+// @Failure      404  {object}  map[string]string  "error: Payment method not found"
+// @Router       /payment-methods/{id} [delete]
+// @Security     Bearer
 func DeletePaymentMethod(c *gin.Context) {
 	id := c.Param("id")
 	var paymentMethod models.PaymentMethod
@@ -120,7 +174,17 @@ func DeletePaymentMethod(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Payment method deleted successfully"})
 }
 
-// TogglePaymentMethodStatus activa/desactiva un método de pago
+// TogglePaymentMethodStatus godoc
+// @Summary      Activar/Desactivar método de pago
+// @Description  Cambia el estado is_active de un método de pago
+// @Tags         payment-methods
+// @Accept       json
+// @Produce      json
+// @Param        id  path  int  true  "ID del método de pago"
+// @Success      200  {object}  map[string]interface{}  "message y data con nuevo estado"
+// @Failure      404  {object}  map[string]string       "error: Payment method not found"
+// @Router       /payment-methods/{id}/toggle [patch]
+// @Security     Bearer
 func TogglePaymentMethodStatus(c *gin.Context) {
 	id := c.Param("id")
 	var paymentMethod models.PaymentMethod

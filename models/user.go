@@ -22,5 +22,5 @@ type User struct {
 	Email    string `json:"email" gorm:"unique;not null" binding:"required,email"`
 	Password string `json:"password" binding:"required,min=6"`
 	Role     Role   `json:"role" binding:"required,oneof=admin user guest"`
-	Activo   bool   `json:"activo" gorm:"default:true"`
+	IsActive bool   `json:"is_active" gorm:"default:true"`
 }

@@ -24,7 +24,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	if !storedUser.Activo {
+	if !storedUser.IsActive {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User account is inactive"})
 		return
 	}
@@ -113,11 +113,11 @@ func Register(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "User created successfully",
 		"user": gin.H{
-			"id":       newUser.ID,
-			"username": newUser.Username,
-			"email":    newUser.Email,
-			"role":     newUser.Role,
-			"activo":   newUser.Activo,
+			"id":        newUser.ID,
+			"username":  newUser.Username,
+			"email":     newUser.Email,
+			"role":      newUser.Role,
+			"is_active": newUser.IsActive,
 		},
 	})
 }

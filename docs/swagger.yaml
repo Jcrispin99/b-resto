@@ -1,0 +1,987 @@
+basePath: /api
+definitions:
+  models.Company:
+    type: object
+  models.PaymentMethod:
+    type: object
+  models.Tax:
+    type: object
+  models.Unit:
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@b-resto.com
+    name: Soporte API
+  description: API RESTful para sistema POS de restaurantes
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: B-Resto API
+  version: "1.0"
+paths:
+  /admin/resources:
+    post:
+      consumes:
+      - application/json
+      description: Crea un nuevo recurso (solo admin)
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: 'message: Resource created by admin'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear recurso
+      tags:
+      - resources
+  /admin/resources/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina un recurso (solo admin)
+      parameters:
+      - description: ID del recurso
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Resource deleted by admin'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Eliminar recurso
+      tags:
+      - resources
+  /admin/users:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todos los usuarios (solo admin)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'users: array de usuarios'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: Failed to fetch users'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar usuarios
+      tags:
+      - users
+  /companies:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todas las compañías y sucursales
+      parameters:
+      - description: Filtrar por estado activo
+        enum:
+        - "true"
+        - "false"
+        in: query
+        name: is_active
+        type: string
+      - description: Incluir compañía matriz
+        enum:
+        - "true"
+        - "false"
+        in: query
+        name: with_parent
+        type: string
+      - description: Incluir sucursales
+        enum:
+        - "true"
+        - "false"
+        in: query
+        name: with_branches
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de companies'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar compañías
+      tags:
+      - companies
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva compañía (casa matriz) o sucursal
+      parameters:
+      - description: Datos de la compañía (incluir parent_id para sucursal)
+        in: body
+        name: company
+        required: true
+        schema:
+          $ref: '#/definitions/models.Company'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data con la compañía creada
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación o parent no encontrado'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: 'error: nombre ya existe'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear compañía
+      tags:
+      - companies
+  /companies/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina una compañía (soft delete). No permite eliminar si tiene
+        sucursales activas.
+      parameters:
+      - description: ID de la compañía
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Company deleted successfully'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: 'error: tiene sucursales activas'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Company not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Eliminar compañía
+      tags:
+      - companies
+    get:
+      consumes:
+      - application/json
+      description: Obtiene una compañía por ID con sus relaciones
+      parameters:
+      - description: ID de la compañía
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: company con parent y branches'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Company not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener compañía
+      tags:
+      - companies
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de una compañía existente
+      parameters:
+      - description: ID de la compañía
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: company
+        required: true
+        schema:
+          $ref: '#/definitions/models.Company'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data actualizada
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Company not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar compañía
+      tags:
+      - companies
+  /companies/{id}/toggle:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado is_active de una compañía
+      parameters:
+      - description: ID de la compañía
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data con nuevo estado
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Company not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Activar/Desactivar compañía
+      tags:
+      - companies
+  /payment-methods:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todos los métodos de pago disponibles
+      parameters:
+      - description: Filtrar por estado activo
+        enum:
+        - "true"
+        - "false"
+        in: query
+        name: is_active
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de payment methods'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar métodos de pago
+      tags:
+      - payment-methods
+    post:
+      consumes:
+      - application/json
+      description: Crea un nuevo método de pago
+      parameters:
+      - description: Datos del método de pago
+        in: body
+        name: paymentMethod
+        required: true
+        schema:
+          $ref: '#/definitions/models.PaymentMethod'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data creada
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: 'error: código duplicado'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear método de pago
+      tags:
+      - payment-methods
+  /payment-methods/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina un método de pago (soft delete)
+      parameters:
+      - description: ID del método de pago
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Payment method deleted successfully'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Payment method not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Eliminar método de pago
+      tags:
+      - payment-methods
+    get:
+      consumes:
+      - application/json
+      description: Obtiene un método de pago por ID
+      parameters:
+      - description: ID del método de pago
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: payment method'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Payment method not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener método de pago
+      tags:
+      - payment-methods
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de un método de pago existente
+      parameters:
+      - description: ID del método de pago
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: paymentMethod
+        required: true
+        schema:
+          $ref: '#/definitions/models.PaymentMethod'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data actualizada
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Payment method not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: 'error: código duplicado'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar método de pago
+      tags:
+      - payment-methods
+  /payment-methods/{id}/toggle:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado is_active de un método de pago
+      parameters:
+      - description: ID del método de pago
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data con nuevo estado
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Payment method not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Activar/Desactivar método de pago
+      tags:
+      - payment-methods
+  /profile:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene el perfil del usuario autenticado desde el token JWT
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'user: datos del usuario'
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: invalid token claims'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener perfil del usuario
+      tags:
+      - users
+  /public/data:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene datos públicos sin autenticación
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Public data accessible to everyone'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Obtener datos públicos
+      tags:
+      - public
+  /resources/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Actualiza un recurso (endpoint de ejemplo)
+      parameters:
+      - description: ID del recurso
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Resource updated'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar recurso
+      tags:
+      - resources
+  /taxes:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todos los impuestos configurados
+      parameters:
+      - description: Filtrar por estado activo
+        enum:
+        - "true"
+        - "false"
+        in: query
+        name: is_active
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de taxes'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar impuestos
+      tags:
+      - taxes
+    post:
+      consumes:
+      - application/json
+      description: Crea un nuevo impuesto
+      parameters:
+      - description: Datos del impuesto
+        in: body
+        name: tax
+        required: true
+        schema:
+          $ref: '#/definitions/models.Tax'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data creada
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: 'error: nombre duplicado'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear impuesto
+      tags:
+      - taxes
+  /taxes/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina un impuesto (soft delete)
+      parameters:
+      - description: ID del impuesto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Tax deleted successfully'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Tax not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Eliminar impuesto
+      tags:
+      - taxes
+    get:
+      consumes:
+      - application/json
+      description: Obtiene un impuesto por ID
+      parameters:
+      - description: ID del impuesto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: tax'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Tax not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener impuesto
+      tags:
+      - taxes
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de un impuesto existente
+      parameters:
+      - description: ID del impuesto
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: tax
+        required: true
+        schema:
+          $ref: '#/definitions/models.Tax'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data actualizada
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Tax not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar impuesto
+      tags:
+      - taxes
+  /taxes/{id}/toggle:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado is_active de un impuesto
+      parameters:
+      - description: ID del impuesto
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data con nuevo estado
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Tax not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Activar/Desactivar impuesto
+      tags:
+      - taxes
+  /units:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todas las unidades de medida
+      parameters:
+      - description: Filtrar por estado activo
+        enum:
+        - "true"
+        - "false"
+        in: query
+        name: is_active
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de units'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar unidades
+      tags:
+      - units
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva unidad de medida
+      parameters:
+      - description: Datos de la unidad (name, abbreviation, type)
+        in: body
+        name: unit
+        required: true
+        schema:
+          $ref: '#/definitions/models.Unit'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data creada
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: 'error: nombre o abreviación duplicada'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear unidad
+      tags:
+      - units
+  /units/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina una unidad de medida (soft delete)
+      parameters:
+      - description: ID de la unidad
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Unit deleted successfully'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Unit not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Eliminar unidad
+      tags:
+      - units
+    get:
+      consumes:
+      - application/json
+      description: Obtiene una unidad de medida por ID
+      parameters:
+      - description: ID de la unidad
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: unit'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Unit not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener unidad
+      tags:
+      - units
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de una unidad existente
+      parameters:
+      - description: ID de la unidad
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: unit
+        required: true
+        schema:
+          $ref: '#/definitions/models.Unit'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data actualizada
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Unit not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar unidad
+      tags:
+      - units
+  /units/{id}/toggle:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado is_active de una unidad
+      parameters:
+      - description: ID de la unidad
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data con nuevo estado
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Unit not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Activar/Desactivar unidad
+      tags:
+      - units
+securityDefinitions:
+  Bearer:
+    description: Escribir "Bearer {token}" para autenticación JWT
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
