@@ -1,12 +1,58 @@
 basePath: /api
 definitions:
+  models.CashMovement:
+    type: object
+  models.Combo:
+    type: object
   models.Company:
     type: object
+  models.InventoryCategory:
+    type: object
+  models.Journal:
+    type: object
+  models.KitchenStation:
+    type: object
+  models.Order:
+    type: object
+  models.OrderPayment:
+    type: object
+  models.POS:
+    type: object
+  models.POSSession:
+    type: object
+  models.Partner:
+    type: object
   models.PaymentMethod:
+    type: object
+  models.ProductAttribute:
+    type: object
+  models.ProductAttributeValue:
+    type: object
+  models.ProductCategory:
+    type: object
+  models.ProductProduct:
+    type: object
+  models.ProductTemplate:
+    type: object
+  models.PurchaseOrder:
+    type: object
+  models.Recipe:
+    type: object
+  models.Reservation:
+    type: object
+  models.Sequence:
+    type: object
+  models.StockTransfer:
+    type: object
+  models.Table:
+    type: object
+  models.TableArea:
     type: object
   models.Tax:
     type: object
   models.Unit:
+    type: object
+  models.Warehouse:
     type: object
 host: localhost:8080
 info:
@@ -89,6 +135,203 @@ paths:
       summary: Listar usuarios
       tags:
       - users
+  /combos:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todos los combos/paquetes de productos
+      parameters:
+      - description: Filtrar por estado activo
+        enum:
+        - "true"
+        - "false"
+        in: query
+        name: is_active
+        type: string
+      - description: Filtrar por categoría
+        in: query
+        name: category_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de combos'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar combos
+      tags:
+      - combos
+    post:
+      consumes:
+      - application/json
+      description: Crea un nuevo combo/paquete de productos
+      parameters:
+      - description: Datos del combo
+        in: body
+        name: combo
+        required: true
+        schema:
+          $ref: '#/definitions/models.Combo'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear combo
+      tags:
+      - combos
+  /combos/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina un combo (soft delete)
+      parameters:
+      - description: ID del combo
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Combo deleted successfully'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Combo not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Eliminar combo
+      tags:
+      - combos
+    get:
+      consumes:
+      - application/json
+      description: Obtiene un combo por ID con todos sus items
+      parameters:
+      - description: ID del combo
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: combo con items'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Combo not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener combo
+      tags:
+      - combos
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de un combo existente
+      parameters:
+      - description: ID del combo
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: combo
+        required: true
+        schema:
+          $ref: '#/definitions/models.Combo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Combo not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar combo
+      tags:
+      - combos
+  /combos/{id}/toggle:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado is_active de un combo
+      parameters:
+      - description: ID del combo
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Combo not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Activar/Desactivar combo
+      tags:
+      - combos
   /companies:
     get:
       consumes:
@@ -309,6 +552,1575 @@ paths:
       summary: Activar/Desactivar compañía
       tags:
       - companies
+  /inventories:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene el inventario/stock actual de productos por almacén
+      parameters:
+      - description: Filtrar por almacén
+        in: query
+        name: warehouse_id
+        type: integer
+      - description: Filtrar por producto
+        in: query
+        name: product_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de inventories'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar inventarios (kardex)
+      tags:
+      - inventories
+  /inventories/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene el inventario de un producto en un almacén específico
+      parameters:
+      - description: ID del inventario
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: inventory'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Inventory not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener inventario
+      tags:
+      - inventories
+  /inventories/adjust:
+    post:
+      consumes:
+      - application/json
+      description: Realiza un ajuste manual de inventario (entrada/salida)
+      parameters:
+      - description: warehouse_id, product_id, quantity, type (in/out), reason
+        in: body
+        name: adjustment
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Ajustar inventario
+      tags:
+      - inventories
+  /inventories/low-stock:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene productos que están por debajo del stock mínimo
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de inventories con stock bajo'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Productos con stock bajo
+      tags:
+      - inventories
+  /inventories/warehouse/{warehouse_id}/product/{product_id}:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene el stock de un producto en un almacén
+      parameters:
+      - description: ID del almacén
+        in: path
+        name: warehouse_id
+        required: true
+        type: integer
+      - description: ID del producto
+        in: path
+        name: product_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: inventory'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Inventory not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener stock específico
+      tags:
+      - inventories
+  /inventory-categories:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todas las categorías de inventario (para materias
+        primas)
+      parameters:
+      - description: Filtrar por estado activo
+        enum:
+        - "true"
+        - "false"
+        in: query
+        name: is_active
+        type: string
+      - description: Filtrar por tipo
+        in: query
+        name: type
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de inventory categories'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar categorías de inventario
+      tags:
+      - inventory-categories
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva categoría de inventario
+      parameters:
+      - description: Datos de la categoría
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/models.InventoryCategory'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear categoría de inventario
+      tags:
+      - inventory-categories
+  /inventory-categories/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina una categoría de inventario (soft delete). No permite si
+        tiene subcategorías.
+      parameters:
+      - description: ID de la categoría
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Inventory category deleted successfully'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: 'error: tiene subcategorías'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Inventory category not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Eliminar categoría de inventario
+      tags:
+      - inventory-categories
+    get:
+      consumes:
+      - application/json
+      description: Obtiene una categoría de inventario por ID con su jerarquía
+      parameters:
+      - description: ID de la categoría
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: inventory category'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Inventory category not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener categoría de inventario
+      tags:
+      - inventory-categories
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de una categoría de inventario existente
+      parameters:
+      - description: ID de la categoría
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/models.InventoryCategory'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Inventory category not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar categoría de inventario
+      tags:
+      - inventory-categories
+  /inventory-categories/{id}/toggle:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado is_active de una categoría de inventario
+      parameters:
+      - description: ID de la categoría
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Inventory category not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Activar/Desactivar categoría de inventario
+      tags:
+      - inventory-categories
+  /journals:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todos los diarios contables
+      parameters:
+      - description: Filtrar por estado activo
+        enum:
+        - "true"
+        - "false"
+        in: query
+        name: is_active
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de journals'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar journals
+      tags:
+      - journals
+    post:
+      consumes:
+      - application/json
+      description: Crea un nuevo diario contable
+      parameters:
+      - description: Datos del journal
+        in: body
+        name: journal
+        required: true
+        schema:
+          $ref: '#/definitions/models.Journal'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear journal
+      tags:
+      - journals
+  /journals/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene un diario contable por ID
+      parameters:
+      - description: ID del journal
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: journal'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Journal not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener journal
+      tags:
+      - journals
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de un diario contable existente
+      parameters:
+      - description: ID del journal
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: journal
+        required: true
+        schema:
+          $ref: '#/definitions/models.Journal'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Journal not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar journal
+      tags:
+      - journals
+  /journals/{id}/toggle:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado is_active de un diario contable
+      parameters:
+      - description: ID del journal
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Journal not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Activar/Desactivar journal
+      tags:
+      - journals
+  /kitchen-stations:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todas las estaciones de cocina
+      parameters:
+      - description: Filtrar por estado activo
+        enum:
+        - "true"
+        - "false"
+        in: query
+        name: is_active
+        type: string
+      - description: Filtrar por compañía/sucursal
+        in: query
+        name: company_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de kitchen stations'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar estaciones de cocina
+      tags:
+      - kitchen-stations
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva estación de cocina
+      parameters:
+      - description: Datos de la estación
+        in: body
+        name: station
+        required: true
+        schema:
+          $ref: '#/definitions/models.KitchenStation'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear estación de cocina
+      tags:
+      - kitchen-stations
+  /kitchen-stations/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina una estación de cocina (soft delete)
+      parameters:
+      - description: ID de la estación
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Kitchen station deleted successfully'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Kitchen station not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Eliminar estación de cocina
+      tags:
+      - kitchen-stations
+    get:
+      consumes:
+      - application/json
+      description: Obtiene una estación de cocina por ID
+      parameters:
+      - description: ID de la estación
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: kitchen station'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Kitchen station not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener estación de cocina
+      tags:
+      - kitchen-stations
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de una estación de cocina existente
+      parameters:
+      - description: ID de la estación
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: station
+        required: true
+        schema:
+          $ref: '#/definitions/models.KitchenStation'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Kitchen station not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar estación de cocina
+      tags:
+      - kitchen-stations
+  /kitchen-stations/{id}/toggle:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado is_active de una estación de cocina
+      parameters:
+      - description: ID de la estación
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Kitchen station not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Activar/Desactivar estación de cocina
+      tags:
+      - kitchen-stations
+  /kitchen-tickets:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de tickets de cocina con filtros
+      parameters:
+      - description: Filtrar por estado
+        enum:
+        - pending
+        - preparing
+        - ready
+        - delivered
+        in: query
+        name: status
+        type: string
+      - description: Filtrar por estación
+        in: query
+        name: station_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de kitchen tickets'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar tickets de cocina
+      tags:
+      - kitchen-tickets
+  /kitchen-tickets/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene un ticket de cocina por ID
+      parameters:
+      - description: ID del ticket
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: kitchen ticket'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Kitchen ticket not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener ticket de cocina
+      tags:
+      - kitchen-tickets
+  /kitchen-tickets/{id}/delivered:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado del ticket a delivered
+      parameters:
+      - description: ID del ticket
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Kitchen ticket not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Marcar ticket como entregado
+      tags:
+      - kitchen-tickets
+  /kitchen-tickets/{id}/preparing:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado del ticket a preparing
+      parameters:
+      - description: ID del ticket
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Kitchen ticket not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Marcar ticket como preparando
+      tags:
+      - kitchen-tickets
+  /kitchen-tickets/{id}/ready:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado del ticket a ready
+      parameters:
+      - description: ID del ticket
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Kitchen ticket not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Marcar ticket como listo
+      tags:
+      - kitchen-tickets
+  /kitchen-tickets/{id}/status:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado de un ticket de cocina
+      parameters:
+      - description: ID del ticket
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 'status: nuevo estado'
+        in: body
+        name: status
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Kitchen ticket not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar estado de ticket
+      tags:
+      - kitchen-tickets
+  /kitchen-tickets/station/{station_id}:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene todos los tickets de una estación de cocina específica
+      parameters:
+      - description: ID de la estación
+        in: path
+        name: station_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de kitchen tickets'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener tickets por estación
+      tags:
+      - kitchen-tickets
+  /orders:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todas las órdenes con filtros
+      parameters:
+      - description: Filtrar por estado
+        enum:
+        - draft
+        - confirmed
+        - done
+        - cancelled
+        in: query
+        name: state
+        type: string
+      - description: Filtrar por mesa
+        in: query
+        name: table_id
+        type: integer
+      - description: Filtrar por fecha (YYYY-MM-DD)
+        in: query
+        name: date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de orders'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar órdenes
+      tags:
+      - orders
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva orden de venta
+      parameters:
+      - description: Datos de la orden
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/models.Order'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear orden
+      tags:
+      - orders
+  /orders/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene una orden por ID con todos sus detalles
+      parameters:
+      - description: ID de la orden
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: order completa'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Order not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener orden
+      tags:
+      - orders
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de una orden existente
+      parameters:
+      - description: ID de la orden
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/models.Order'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Order not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar orden
+      tags:
+      - orders
+  /orders/{id}/cancel:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado de la orden a cancelled
+      parameters:
+      - description: ID de la orden
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Order not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Cancelar orden
+      tags:
+      - orders
+  /orders/{id}/complete:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado de la orden a done
+      parameters:
+      - description: ID de la orden
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Order not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Completar orden
+      tags:
+      - orders
+  /orders/{id}/confirm:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado de la orden a confirmed
+      parameters:
+      - description: ID de la orden
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Order not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Confirmar orden
+      tags:
+      - orders
+  /orders/{order_id}/payments:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de pagos de una orden específica
+      parameters:
+      - description: ID de la orden
+        in: path
+        name: order_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de payments'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar pagos de orden
+      tags:
+      - order-payments
+    post:
+      consumes:
+      - application/json
+      description: Registra un nuevo pago para una orden
+      parameters:
+      - description: ID de la orden
+        in: path
+        name: order_id
+        required: true
+        type: integer
+      - description: Datos del pago
+        in: body
+        name: payment
+        required: true
+        schema:
+          $ref: '#/definitions/models.OrderPayment'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear pago de orden
+      tags:
+      - order-payments
+  /orders/{order_id}/payments/{payment_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina un pago de una orden
+      parameters:
+      - description: ID de la orden
+        in: path
+        name: order_id
+        required: true
+        type: integer
+      - description: ID del pago
+        in: path
+        name: payment_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Payment deleted successfully'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Payment not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Eliminar pago de orden
+      tags:
+      - order-payments
+  /orders/table/{table_id}:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene todas las órdenes de una mesa específica
+      parameters:
+      - description: ID de la mesa
+        in: path
+        name: table_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de orders'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener órdenes por mesa
+      tags:
+      - orders
+  /partners:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todos los partners (proveedores/clientes)
+      parameters:
+      - description: Filtrar por estado activo
+        enum:
+        - "true"
+        - "false"
+        in: query
+        name: is_active
+        type: string
+      - description: Filtrar por proveedor
+        enum:
+        - "true"
+        - "false"
+        in: query
+        name: is_supplier
+        type: string
+      - description: Filtrar por cliente
+        enum:
+        - "true"
+        - "false"
+        in: query
+        name: is_customer
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de partners'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar partners
+      tags:
+      - partners
+    post:
+      consumes:
+      - application/json
+      description: Crea un nuevo partner (proveedor/cliente)
+      parameters:
+      - description: Datos del partner
+        in: body
+        name: partner
+        required: true
+        schema:
+          $ref: '#/definitions/models.Partner'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear partner
+      tags:
+      - partners
+  /partners/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina un partner (soft delete)
+      parameters:
+      - description: ID del partner
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Partner deleted successfully'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Partner not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Eliminar partner
+      tags:
+      - partners
+    get:
+      consumes:
+      - application/json
+      description: Obtiene un partner por ID
+      parameters:
+      - description: ID del partner
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: partner'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Partner not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener partner
+      tags:
+      - partners
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de un partner existente
+      parameters:
+      - description: ID del partner
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: partner
+        required: true
+        schema:
+          $ref: '#/definitions/models.Partner'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Partner not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar partner
+      tags:
+      - partners
+  /partners/{id}/toggle:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado is_active de un partner
+      parameters:
+      - description: ID del partner
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Partner not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Activar/Desactivar partner
+      tags:
+      - partners
+  /partners/customers:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene todos los partners marcados como clientes
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de customers'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener clientes
+      tags:
+      - partners
+  /partners/suppliers:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene todos los partners marcados como proveedores
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de suppliers'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener proveedores
+      tags:
+      - partners
   /payment-methods:
     get:
       consumes:
@@ -514,6 +2326,1388 @@ paths:
       summary: Activar/Desactivar método de pago
       tags:
       - payment-methods
+  /pos:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todos los terminales POS
+      parameters:
+      - description: Filtrar por estado activo
+        enum:
+        - "true"
+        - "false"
+        in: query
+        name: is_active
+        type: string
+      - description: Filtrar por compañía
+        in: query
+        name: company_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de pos terminals'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar terminales POS
+      tags:
+      - pos
+    post:
+      consumes:
+      - application/json
+      description: Crea un nuevo terminal POS
+      parameters:
+      - description: Datos del terminal
+        in: body
+        name: pos
+        required: true
+        schema:
+          $ref: '#/definitions/models.POS'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear terminal POS
+      tags:
+      - pos
+  /pos-sessions:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todas las sesiones de caja
+      parameters:
+      - description: Filtrar por terminal POS
+        in: query
+        name: pos_id
+        type: integer
+      - description: Filtrar por estado
+        enum:
+        - opened
+        - closed
+        in: query
+        name: state
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de pos sessions'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar sesiones POS
+      tags:
+      - pos-sessions
+  /pos-sessions/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene una sesión de caja por ID
+      parameters:
+      - description: ID de la sesión
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: pos session'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: POS session not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener sesión POS
+      tags:
+      - pos-sessions
+  /pos-sessions/{id}/close:
+    patch:
+      consumes:
+      - application/json
+      description: Cierra una sesión de caja abierta
+      parameters:
+      - description: ID de la sesión
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 'closing_cash: efectivo al cerrar'
+        in: body
+        name: request
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación o sesión ya cerrada'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: POS session not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Cerrar sesión de caja
+      tags:
+      - pos-sessions
+  /pos-sessions/{id}/movements:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene todos los movimientos de efectivo de una sesión
+      parameters:
+      - description: ID de la sesión
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de cash movements'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener movimientos de sesión
+      tags:
+      - pos-sessions
+  /pos-sessions/{session_id}/cash-movements:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de movimientos de efectivo por sesión
+      parameters:
+      - description: ID de la sesión
+        in: path
+        name: session_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de cash movements'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar movimientos de efectivo
+      tags:
+      - cash-movements
+    post:
+      consumes:
+      - application/json
+      description: Registra un nuevo movimiento de efectivo (ingreso/egreso)
+      parameters:
+      - description: ID de la sesión
+        in: path
+        name: session_id
+        required: true
+        type: integer
+      - description: Datos del movimiento
+        in: body
+        name: movement
+        required: true
+        schema:
+          $ref: '#/definitions/models.CashMovement'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear movimiento de efectivo
+      tags:
+      - cash-movements
+  /pos-sessions/{session_id}/cash-movements/{movement_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina un movimiento de efectivo de una sesión de caja
+      parameters:
+      - description: ID de la sesión
+        in: path
+        name: session_id
+        required: true
+        type: integer
+      - description: ID del movimiento
+        in: path
+        name: movement_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Cash movement deleted successfully'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Cash movement not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Eliminar movimiento de efectivo
+      tags:
+      - cash-movements
+  /pos-sessions/active:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene todas las sesiones de caja abiertas
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de sesiones abiertas'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener sesiones activas
+      tags:
+      - pos-sessions
+  /pos-sessions/open:
+    post:
+      consumes:
+      - application/json
+      description: Abre una nueva sesión de caja en un terminal POS
+      parameters:
+      - description: Datos de la sesión (pos_id, user_id, opening_cash)
+        in: body
+        name: session
+        required: true
+        schema:
+          $ref: '#/definitions/models.POSSession'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación o sesión ya abierta'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Abrir sesión de caja
+      tags:
+      - pos-sessions
+  /pos/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene un terminal POS por ID
+      parameters:
+      - description: ID del terminal
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: pos terminal'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: POS terminal not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener terminal POS
+      tags:
+      - pos
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de un terminal POS existente
+      parameters:
+      - description: ID del terminal
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: pos
+        required: true
+        schema:
+          $ref: '#/definitions/models.POS'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: POS terminal not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar terminal POS
+      tags:
+      - pos
+  /pos/{id}/toggle:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado is_active de un terminal POS
+      parameters:
+      - description: ID del terminal
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: POS terminal not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Activar/Desactivar terminal POS
+      tags:
+      - pos
+  /product-attribute-values:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todos los valores de atributos de producto
+      parameters:
+      - description: Filtrar por atributo
+        in: query
+        name: attribute_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de attribute values'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar valores de atributo
+      tags:
+      - product-attribute-values
+    post:
+      consumes:
+      - application/json
+      description: Crea un nuevo valor de atributo
+      parameters:
+      - description: Datos del valor
+        in: body
+        name: value
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductAttributeValue'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear valor de atributo
+      tags:
+      - product-attribute-values
+  /product-attribute-values/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina un valor de atributo (soft delete)
+      parameters:
+      - description: ID del valor
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Attribute value deleted successfully'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Attribute value not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Eliminar valor de atributo
+      tags:
+      - product-attribute-values
+    get:
+      consumes:
+      - application/json
+      description: Obtiene un valor de atributo por ID
+      parameters:
+      - description: ID del valor
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: attribute value'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Attribute value not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener valor de atributo
+      tags:
+      - product-attribute-values
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de un valor de atributo existente
+      parameters:
+      - description: ID del valor
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: value
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductAttributeValue'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Attribute value not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar valor de atributo
+      tags:
+      - product-attribute-values
+  /product-attributes:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todos los atributos (Tamaño, Color, etc.)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de product attributes'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar atributos de producto
+      tags:
+      - product-attributes
+    post:
+      consumes:
+      - application/json
+      description: Crea un nuevo atributo de producto
+      parameters:
+      - description: Datos del atributo
+        in: body
+        name: attribute
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductAttribute'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear atributo de producto
+      tags:
+      - product-attributes
+  /product-attributes/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina un atributo de producto (soft delete)
+      parameters:
+      - description: ID del atributo
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Product attribute deleted successfully'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Product attribute not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Eliminar atributo de producto
+      tags:
+      - product-attributes
+    get:
+      consumes:
+      - application/json
+      description: Obtiene un atributo de producto por ID con sus valores
+      parameters:
+      - description: ID del atributo
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: product attribute'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Product attribute not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener atributo de producto
+      tags:
+      - product-attributes
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de un atributo de producto existente
+      parameters:
+      - description: ID del atributo
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: attribute
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductAttribute'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Product attribute not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar atributo de producto
+      tags:
+      - product-attributes
+  /product-categories:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todas las categorías de productos/menú con jerarquía
+      parameters:
+      - description: Filtrar por estado activo
+        enum:
+        - "true"
+        - "false"
+        in: query
+        name: is_active
+        type: string
+      - description: Filtrar por categoría padre (null para raíz)
+        in: query
+        name: parent_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de product categories'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar categorías de productos
+      tags:
+      - product-categories
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva categoría de producto/menú
+      parameters:
+      - description: Datos de la categoría
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductCategory'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear categoría de producto
+      tags:
+      - product-categories
+  /product-categories/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina una categoría de producto (soft delete). No permite si
+        tiene subcategorías.
+      parameters:
+      - description: ID de la categoría
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Product category deleted successfully'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: 'error: tiene subcategorías'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Product category not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Eliminar categoría de producto
+      tags:
+      - product-categories
+    get:
+      consumes:
+      - application/json
+      description: Obtiene una categoría de producto por ID con su jerarquía
+      parameters:
+      - description: ID de la categoría
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: product category'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Product category not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener categoría de producto
+      tags:
+      - product-categories
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de una categoría de producto existente
+      parameters:
+      - description: ID de la categoría
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductCategory'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Product category not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar categoría de producto
+      tags:
+      - product-categories
+  /product-categories/{id}/toggle:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado is_active de una categoría de producto
+      parameters:
+      - description: ID de la categoría
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Product category not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Activar/Desactivar categoría de producto
+      tags:
+      - product-categories
+  /product-templates:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todas las plantillas de producto (maestro)
+      parameters:
+      - description: Filtrar por estado activo
+        enum:
+        - "true"
+        - "false"
+        in: query
+        name: is_active
+        type: string
+      - description: Filtrar por categoría
+        in: query
+        name: category_id
+        type: integer
+      - description: Filtrar por vendible
+        enum:
+        - "true"
+        - "false"
+        in: query
+        name: can_be_sold
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de product templates'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar plantillas de producto
+      tags:
+      - product-templates
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva plantilla de producto con variante default automática
+      parameters:
+      - description: Datos de la plantilla
+        in: body
+        name: template
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductTemplate'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message, template y default_variant
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear plantilla de producto
+      tags:
+      - product-templates
+  /product-templates/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina una plantilla de producto (soft delete)
+      parameters:
+      - description: ID de la plantilla
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Product template deleted successfully'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Product template not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Eliminar plantilla de producto
+      tags:
+      - product-templates
+    get:
+      consumes:
+      - application/json
+      description: Obtiene una plantilla de producto por ID con todas sus relaciones
+      parameters:
+      - description: ID de la plantilla
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: product template'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Product template not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener plantilla de producto
+      tags:
+      - product-templates
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de una plantilla de producto existente
+      parameters:
+      - description: ID de la plantilla
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: template
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductTemplate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Product template not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar plantilla de producto
+      tags:
+      - product-templates
+  /product-templates/{id}/toggle:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado is_active de una plantilla de producto
+      parameters:
+      - description: ID de la plantilla
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Product template not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Activar/Desactivar plantilla
+      tags:
+      - product-templates
+  /product-variants:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todas las variantes/SKUs de productos
+      parameters:
+      - description: Filtrar por template
+        in: query
+        name: template_id
+        type: integer
+      - description: Filtrar por estado activo
+        enum:
+        - "true"
+        - "false"
+        in: query
+        name: is_active
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de product variants'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar variantes de producto
+      tags:
+      - product-variants
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva variante/SKU de producto
+      parameters:
+      - description: Datos de la variante
+        in: body
+        name: variant
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductProduct'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear variante de producto
+      tags:
+      - product-variants
+  /product-variants/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina una variante/SKU (soft delete)
+      parameters:
+      - description: ID de la variante
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Product variant deleted successfully'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Product variant not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Eliminar variante de producto
+      tags:
+      - product-variants
+    get:
+      consumes:
+      - application/json
+      description: Obtiene una variante/SKU por ID
+      parameters:
+      - description: ID de la variante
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: product variant'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Product variant not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener variante de producto
+      tags:
+      - product-variants
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de una variante/SKU existente
+      parameters:
+      - description: ID de la variante
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: variant
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductProduct'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Product variant not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar variante de producto
+      tags:
+      - product-variants
+  /product-variants/{id}/toggle:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado is_active de una variante de producto
+      parameters:
+      - description: ID de la variante
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Product variant not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Activar/Desactivar variante
+      tags:
+      - product-variants
   /profile:
     get:
       consumes:
@@ -555,6 +3749,668 @@ paths:
       summary: Obtener datos públicos
       tags:
       - public
+  /purchase-orders:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todas las órdenes de compra
+      parameters:
+      - description: Filtrar por estado
+        enum:
+        - draft
+        - sent
+        - received
+        - cancelled
+        in: query
+        name: status
+        type: string
+      - description: Filtrar por proveedor
+        in: query
+        name: partner_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de purchase orders'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar órdenes de compra
+      tags:
+      - purchase-orders
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva orden de compra
+      parameters:
+      - description: Datos de la orden
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/models.PurchaseOrder'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear orden de compra
+      tags:
+      - purchase-orders
+  /purchase-orders/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene una orden de compra por ID con todos sus detalles
+      parameters:
+      - description: ID de la orden de compra
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: purchase order completa'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Purchase order not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener orden de compra
+      tags:
+      - purchase-orders
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de una orden de compra existente
+      parameters:
+      - description: ID de la orden
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/models.PurchaseOrder'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Purchase order not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar orden de compra
+      tags:
+      - purchase-orders
+  /purchase-orders/{id}/cancel:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado de la orden a cancelled
+      parameters:
+      - description: ID de la orden
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Purchase order not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Cancelar orden de compra
+      tags:
+      - purchase-orders
+  /purchase-orders/{id}/receive:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado de la orden a received (actualiza inventario)
+      parameters:
+      - description: ID de la orden
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Purchase order not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Recibir orden de compra
+      tags:
+      - purchase-orders
+  /purchase-orders/{id}/send:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado de la orden a sent
+      parameters:
+      - description: ID de la orden
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Purchase order not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Enviar orden de compra
+      tags:
+      - purchase-orders
+  /recipes:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todas las recetas de productos
+      parameters:
+      - description: Filtrar por producto
+        in: query
+        name: product_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de recipes'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar recetas
+      tags:
+      - recipes
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva receta de producto con sus ingredientes
+      parameters:
+      - description: Datos de la receta
+        in: body
+        name: recipe
+        required: true
+        schema:
+          $ref: '#/definitions/models.Recipe'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear receta
+      tags:
+      - recipes
+  /recipes/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina una receta (soft delete)
+      parameters:
+      - description: ID de la receta
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Recipe deleted successfully'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Recipe not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Eliminar receta
+      tags:
+      - recipes
+    get:
+      consumes:
+      - application/json
+      description: Obtiene una receta por ID con todos sus ingredientes
+      parameters:
+      - description: ID de la receta
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: recipe con items'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Recipe not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener receta
+      tags:
+      - recipes
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de una receta existente
+      parameters:
+      - description: ID de la receta
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: recipe
+        required: true
+        schema:
+          $ref: '#/definitions/models.Recipe'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Recipe not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar receta
+      tags:
+      - recipes
+  /reservations:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todas las reservas
+      parameters:
+      - description: Filtrar por estado
+        enum:
+        - pending
+        - confirmed
+        - seated
+        - cancelled
+        - no_show
+        in: query
+        name: status
+        type: string
+      - description: Filtrar por fecha (YYYY-MM-DD)
+        in: query
+        name: date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de reservations'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar reservas
+      tags:
+      - reservations
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva reserva
+      parameters:
+      - description: Datos de la reserva
+        in: body
+        name: reservation
+        required: true
+        schema:
+          $ref: '#/definitions/models.Reservation'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear reserva
+      tags:
+      - reservations
+  /reservations/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene una reserva por ID
+      parameters:
+      - description: ID de la reserva
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: reservation'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Reservation not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener reserva
+      tags:
+      - reservations
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de una reserva existente
+      parameters:
+      - description: ID de la reserva
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: reservation
+        required: true
+        schema:
+          $ref: '#/definitions/models.Reservation'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Reservation not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar reserva
+      tags:
+      - reservations
+  /reservations/{id}/cancel:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado de la reserva a cancelled
+      parameters:
+      - description: ID de la reserva
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Reservation not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Cancelar reserva
+      tags:
+      - reservations
+  /reservations/{id}/confirm:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado de la reserva a confirmed
+      parameters:
+      - description: ID de la reserva
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Reservation not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Confirmar reserva
+      tags:
+      - reservations
+  /reservations/{id}/seat:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado de la reserva a seated y asigna mesa
+      parameters:
+      - description: ID de la reserva
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 'table_id: ID de la mesa'
+        in: body
+        name: request
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Reservation not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Sentar reserva
+      tags:
+      - reservations
+  /reservations/date/{date}:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene todas las reservas de una fecha específica
+      parameters:
+      - description: Fecha (YYYY-MM-DD)
+        in: path
+        name: date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de reservations'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener reservas por fecha
+      tags:
+      - reservations
   /resources/{id}:
     put:
       consumes:
@@ -580,6 +4436,840 @@ paths:
       summary: Actualizar recurso
       tags:
       - resources
+  /sequences:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todas las secuencias de numeración
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de sequences'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar secuencias
+      tags:
+      - sequences
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva secuencia de numeración
+      parameters:
+      - description: Datos de la secuencia
+        in: body
+        name: sequence
+        required: true
+        schema:
+          $ref: '#/definitions/models.Sequence'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear secuencia
+      tags:
+      - sequences
+  /sequences/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene una secuencia por ID
+      parameters:
+      - description: ID de la secuencia
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: sequence'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Sequence not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener secuencia
+      tags:
+      - sequences
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de una secuencia existente
+      parameters:
+      - description: ID de la secuencia
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: sequence
+        required: true
+        schema:
+          $ref: '#/definitions/models.Sequence'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Sequence not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar secuencia
+      tags:
+      - sequences
+  /sequences/{id}/next:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene el siguiente número de una secuencia por ID e incrementa
+        el contador
+      parameters:
+      - description: ID de la secuencia
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'next_number: siguiente número formateado'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Sequence not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener siguiente número
+      tags:
+      - sequences
+  /stock-transfers:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todas las transferencias entre almacenes
+      parameters:
+      - description: Filtrar por estado
+        enum:
+        - draft
+        - in_transit
+        - received
+        - cancelled
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de stock transfers'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar transferencias de stock
+      tags:
+      - stock-transfers
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva transferencia entre almacenes
+      parameters:
+      - description: Datos de la transferencia
+        in: body
+        name: transfer
+        required: true
+        schema:
+          $ref: '#/definitions/models.StockTransfer'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear transferencia de stock
+      tags:
+      - stock-transfers
+  /stock-transfers/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene una transferencia por ID con todos sus detalles
+      parameters:
+      - description: ID de la transferencia
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: stock transfer completa'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Stock transfer not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener transferencia de stock
+      tags:
+      - stock-transfers
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de una transferencia existente
+      parameters:
+      - description: ID de la transferencia
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: transfer
+        required: true
+        schema:
+          $ref: '#/definitions/models.StockTransfer'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Stock transfer not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar transferencia de stock
+      tags:
+      - stock-transfers
+  /stock-transfers/{id}/cancel:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado a cancelled
+      parameters:
+      - description: ID de la transferencia
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Stock transfer not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Cancelar transferencia
+      tags:
+      - stock-transfers
+  /stock-transfers/{id}/receive:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado a received (suma al destino)
+      parameters:
+      - description: ID de la transferencia
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Stock transfer not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Recibir transferencia
+      tags:
+      - stock-transfers
+  /stock-transfers/{id}/send:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado a in_transit (descuenta del origen)
+      parameters:
+      - description: ID de la transferencia
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Stock transfer not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Enviar transferencia
+      tags:
+      - stock-transfers
+  /table-areas:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todas las áreas de mesas
+      parameters:
+      - description: Filtrar por estado activo
+        enum:
+        - "true"
+        - "false"
+        in: query
+        name: is_active
+        type: string
+      - description: Filtrar por compañía/sucursal
+        in: query
+        name: company_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de table areas'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar áreas de mesas
+      tags:
+      - table-areas
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva área de mesas
+      parameters:
+      - description: Datos del área
+        in: body
+        name: area
+        required: true
+        schema:
+          $ref: '#/definitions/models.TableArea'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear área de mesas
+      tags:
+      - table-areas
+  /table-areas/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina un área de mesas (soft delete)
+      parameters:
+      - description: ID del área
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Table area deleted successfully'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Table area not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Eliminar área de mesas
+      tags:
+      - table-areas
+    get:
+      consumes:
+      - application/json
+      description: Obtiene un área de mesas por ID
+      parameters:
+      - description: ID del área
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: table area'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Table area not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener área de mesas
+      tags:
+      - table-areas
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de un área de mesas existente
+      parameters:
+      - description: ID del área
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: area
+        required: true
+        schema:
+          $ref: '#/definitions/models.TableArea'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Table area not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar área de mesas
+      tags:
+      - table-areas
+  /table-areas/{id}/toggle:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado is_active de un área de mesas
+      parameters:
+      - description: ID del área
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Table area not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Activar/Desactivar área de mesas
+      tags:
+      - table-areas
+  /tables:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todas las mesas
+      parameters:
+      - description: Filtrar por estado activo
+        enum:
+        - "true"
+        - "false"
+        in: query
+        name: is_active
+        type: string
+      - description: Filtrar por área
+        in: query
+        name: area_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de tables'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar mesas
+      tags:
+      - tables
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva mesa
+      parameters:
+      - description: Datos de la mesa
+        in: body
+        name: table
+        required: true
+        schema:
+          $ref: '#/definitions/models.Table'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear mesa
+      tags:
+      - tables
+  /tables/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina una mesa (soft delete)
+      parameters:
+      - description: ID de la mesa
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Table deleted successfully'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Table not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Eliminar mesa
+      tags:
+      - tables
+    get:
+      consumes:
+      - application/json
+      description: Obtiene una mesa por ID
+      parameters:
+      - description: ID de la mesa
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: table'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Table not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener mesa
+      tags:
+      - tables
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de una mesa existente
+      parameters:
+      - description: ID de la mesa
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: table
+        required: true
+        schema:
+          $ref: '#/definitions/models.Table'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Table not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar mesa
+      tags:
+      - tables
+  /tables/{id}/toggle:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado is_active de una mesa
+      parameters:
+      - description: ID de la mesa
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Table not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Activar/Desactivar mesa
+      tags:
+      - tables
+  /tables/area/{area_id}:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene todas las mesas de un área específica
+      parameters:
+      - description: ID del área
+        in: path
+        name: area_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de tables'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener mesas por área
+      tags:
+      - tables
+  /tables/available:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene todas las mesas activas sin órdenes pendientes
+      parameters:
+      - description: Filtrar por área
+        in: query
+        name: area_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de tables disponibles'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener mesas disponibles
+      tags:
+      - tables
   /taxes:
     get:
       consumes:
@@ -978,6 +5668,209 @@ paths:
       summary: Activar/Desactivar unidad
       tags:
       - units
+  /warehouses:
+    get:
+      consumes:
+      - application/json
+      description: Obtiene lista de todos los almacenes
+      parameters:
+      - description: Filtrar por estado activo
+        enum:
+        - "true"
+        - "false"
+        in: query
+        name: is_active
+        type: string
+      - description: Filtrar por compañía/sucursal
+        in: query
+        name: company_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: array de warehouses'
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: 'error: mensaje'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar almacenes
+      tags:
+      - warehouses
+    post:
+      consumes:
+      - application/json
+      description: Crea un nuevo almacén
+      parameters:
+      - description: Datos del almacén
+        in: body
+        name: warehouse
+        required: true
+        schema:
+          $ref: '#/definitions/models.Warehouse'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: 'error: código duplicado'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Crear almacén
+      tags:
+      - warehouses
+  /warehouses/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Elimina un almacén (soft delete)
+      parameters:
+      - description: ID del almacén
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: Warehouse deleted successfully'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Warehouse not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Eliminar almacén
+      tags:
+      - warehouses
+    get:
+      consumes:
+      - application/json
+      description: Obtiene un almacén por ID
+      parameters:
+      - description: ID del almacén
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'data: warehouse'
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Warehouse not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obtener almacén
+      tags:
+      - warehouses
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de un almacén existente
+      parameters:
+      - description: ID del almacén
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Datos actualizados
+        in: body
+        name: warehouse
+        required: true
+        schema:
+          $ref: '#/definitions/models.Warehouse'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'error: validación'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'error: Warehouse not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Actualizar almacén
+      tags:
+      - warehouses
+  /warehouses/{id}/toggle:
+    patch:
+      consumes:
+      - application/json
+      description: Cambia el estado is_active de un almacén
+      parameters:
+      - description: ID del almacén
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: message y data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: 'error: Warehouse not found'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Activar/Desactivar almacén
+      tags:
+      - warehouses
 securityDefinitions:
   Bearer:
     description: Escribir "Bearer {token}" para autenticación JWT

@@ -70,11 +70,49 @@ func SetupRoutes(r *gin.Engine) {
 			admin.GET("/users", controllers.GetUsers)
 		}
 
-		// Rutas API- endpoints
+		// Rutas API - endpoints
 		SetupUnitsRoutes(api)
 		SetupCompanyRoutes(api)
 		SetupTaxesRoutes(api)
 		SetupPaymentMethodsRoutes(api)
+
+		// FASE 1: Catálogos Base
+		SetupWarehouseRoutes(r)
+		SetupKitchenStationRoutes(r)
+		SetupInventoryCategoryRoutes(r)
+
+		// FASE 2: Categorías de Productos
+		SetupProductCategoryRoutes(r)
+
+		// FASE 5: Secuencias y Journals
+		SetupSequenceRoutes(r)
+		SetupJournalRoutes(r)
+
+		// FASE 6: Mesas y Reservaciones
+		SetupTableAreaRoutes(r)
+		SetupTableRoutes(r)
+		SetupReservationRoutes(r)
+
+		// FASE 7: Órdenes de Venta (CRÍTICO POS)
+		SetupOrderRoutes(r)
+		SetupKitchenTicketRoutes(r)
+
+		// FASE 8: POS y Caja
+		SetupPOSRoutes(r)
+		SetupPOSSessionRoutes(r)
+
+		// FASE 9: Proveedores/Clientes
+		SetupPartnerRoutes(r)
+
+		// FASE 10: Compras y Transferencias
+		SetupPurchaseOrderRoutes(r)
+		SetupStockTransferRoutes(r)
+
+		// FASE 11: Inventario (Kardex)
+		SetupInventoryRoutes(r)
+
+		// FASE 3-4: Módulo de Productos (COMPLETO)
+		SetupProductRoutes(r)
 	}
 
 	r.GET("/health", func(c *gin.Context) {

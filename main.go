@@ -39,11 +39,56 @@ func main() {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 	if err := db.AutoMigrate(
+		// Existentes
 		&models.User{},
 		&models.Unit{},
 		&models.Company{},
 		&models.PaymentMethod{},
 		&models.Tax{},
+
+		// Nuevos - Base
+		&models.InventoryCategory{},
+		&models.ProductCategory{},
+		&models.KitchenStation{},
+		&models.Warehouse{},
+		&models.TableArea{},
+		&models.Table{},
+
+		// Nuevos - Productos
+		&models.ProductTemplate{},
+		&models.ProductProduct{},
+		&models.ProductAttribute{},
+		&models.ProductAttributeValue{},
+
+		// Nuevos - Combos
+		&models.Combo{},
+		&models.ComboItem{},
+
+		// Nuevos - Órdenes y Ventas
+		&models.Sequence{},
+		&models.Journal{},
+		&models.Order{},
+		&models.OrderItem{},
+		&models.OrderPayment{},
+		&models.KitchenTicket{},
+		&models.KitchenTicketItem{},
+
+		// Nuevos - POS y Caja
+		&models.POS{},
+		&models.POSSession{},
+		&models.CashMovement{},
+
+		// Nuevos - Inventario
+		&models.Partner{},
+		&models.Recipe{},
+		&models.StockTransfer{},
+		&models.StockTransferItem{},
+		&models.PurchaseOrder{},
+		&models.PurchaseOrderItem{},
+		&models.Inventory{},
+
+		// Nuevos - Reservaciones
+		&models.Reservation{},
 	); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}

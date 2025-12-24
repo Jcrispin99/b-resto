@@ -11,6 +11,9 @@ type Company struct {
 	Parent   *Company  `json:"parent,omitempty" gorm:"foreignKey:ParentID"`
 	Branches []Company `json:"branches,omitempty" gorm:"foreignKey:ParentID"`
 
+	// Código de sucursal/empresa (antes en Branch)
+	Code string `json:"code" gorm:"size:50;uniqueIndex"`
+
 	// Información básica
 	Name         string `json:"name" gorm:"size:200;not null" binding:"required,min=3,max=200"`
 	BusinessName string `json:"business_name" gorm:"size:200;not null" binding:"required,min=3,max=200"`
